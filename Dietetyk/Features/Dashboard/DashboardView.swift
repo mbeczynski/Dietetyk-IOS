@@ -55,23 +55,13 @@ struct DashboardView: View {
     // MARK: - Nawigacja po dniach
 
     private var dateNavigator: some View {
-        HStack {
-            Button { viewModel.goToPreviousDay() } label: {
-                Image(systemName: "chevron.left")
-            }
-            Spacer()
-            Button { viewModel.goToToday() } label: {
-                Text(APIDateFormat.displayFormatter.string(from: viewModel.selectedDate))
-                    .font(.subheadline.weight(.medium))
-            }
-            .disabled(viewModel.isToday)
-            Spacer()
-            Button { viewModel.goToNextDay() } label: {
-                Image(systemName: "chevron.right")
-            }
-            .disabled(viewModel.isToday)
-        }
-        .buttonStyle(.plain)
+        DayNavigatorView(
+            dateText: APIDateFormat.displayFormatter.string(from: viewModel.selectedDate),
+            isToday: viewModel.isToday,
+            onPrevious: { viewModel.goToPreviousDay() },
+            onToday: { viewModel.goToToday() },
+            onNext: { viewModel.goToNextDay() }
+        )
     }
 
     // MARK: - Kalorie

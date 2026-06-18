@@ -66,8 +66,11 @@ struct DashboardSummary: Decodable {
     let fatRatio: Double?
     let muscleMass: Double?
 
-    // Nawodnienie - aktualne spożycie dzisiaj (cel to targetWaterMl powyżej)
-    let waterMl: Int
+    // Nawodnienie - aktualne spożycie dzisiaj (cel to targetWaterMl powyżej).
+    // `var`, nie `let`: po `POST /api/water/add|reset` aktualizujemy tę
+    // wartość lokalnie z odpowiedzi endpointu, bez ponownego odpytywania
+    // całego /api/dashboard (patrz `DashboardViewModel.addWater`).
+    var waterMl: Int
 
     // Flagi podłączonych integracji
     let hasOura: Bool
@@ -77,7 +80,7 @@ struct DashboardSummary: Decodable {
 /// Pełna odpowiedź `GET /api/dashboard?date=YYYY-MM-DD`.
 struct DashboardResponse: Decodable {
     let date: String
-    let summary: DashboardSummary
+    var summary: DashboardSummary
     let meals: [Meal]
     let aiAdvice: String?
 }

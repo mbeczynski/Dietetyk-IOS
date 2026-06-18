@@ -1,13 +1,15 @@
 import SwiftUI
 
-/// Tymczasowy szkielet głównej nawigacji - zakładki Dashboard/Posiłki
-/// dostaną pełną treść w kolejnych krokach (patrz lista zadań: #59, #60).
-/// Zakładka Ustawienia ma już teraz działający przycisk wylogowania, żeby
-/// cały cykl logowanie -> sesja -> wylogowanie był od razu testowalny.
+/// Główna nawigacja po zalogowaniu. Dashboard ma już pełną treść (#59);
+/// Posiłki i Ustawienia dostaną swoją w kolejnych krokach (#60/#61) - do
+/// tego czasu zakładka Ustawienia ma już działający przycisk wylogowania,
+/// żeby cały cykl logowanie -> sesja -> wylogowanie był od razu testowalny.
 struct MainTabView: View {
+    @EnvironmentObject private var appState: AppState
+
     var body: some View {
         TabView {
-            placeholder(title: "Dashboard", systemImage: "chart.bar.fill", note: "Podsumowanie dnia - kalorie, makro, zdrowie. (W budowie)")
+            DashboardView(appState: appState)
                 .tabItem { Label("Dashboard", systemImage: "chart.bar.fill") }
 
             placeholder(title: "Posiłki", systemImage: "fork.knife", note: "Lista posiłków i dodawanie nowych (tekst/zdjęcie). (W budowie)")

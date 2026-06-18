@@ -1,0 +1,48 @@
+name: Dietetyk
+options:
+  bundleIdPrefix: com.renacode
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: ""
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    ENABLE_PREVIEWS: YES
+
+targets:
+  Dietetyk:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Dietetyk
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.renacode.dietetyk
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: "Dietetyk AI"
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_NSCameraUsageDescription: "Aplikacja potrzebuje dostępu do aparatu, aby zrobić zdjęcie posiłku do analizy AI."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Aplikacja potrzebuje dostępu do zdjęć, aby wybrać zdjęcie posiłku do analizy AI."
+    info:
+      properties:
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    capabilities: []
+
+schemes:
+  Dietetyk:
+    build:
+      targets:
+        Dietetyk: all
+    run:
+      config: Debug
+    archive:
+      config: Release

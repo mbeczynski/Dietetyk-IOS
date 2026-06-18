@@ -1,0 +1,33 @@
+# Xcode
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+.build/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+# XcodeGen generuje .xcodeproj z project.yml - nie commitujemy wygenerowanego
+# projektu (binarny, konfliktogenny w diffach), tylko jego "źródło prawdy".
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+Package.resolved
+
+# CocoaPods (na wypadek użycia w przyszłości)
+Pods/
+
+# Fastlane (na wypadek użycia w przyszłości)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# macOS
+.DS_Store
+
+# Sekrety lokalne (np. lokalny URL backendu do testów, nigdy nie commitować)
+*.xcconfig.local
+Secrets.swift

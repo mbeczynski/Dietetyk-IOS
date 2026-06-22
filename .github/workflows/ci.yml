@@ -1,0 +1,48 @@
+name: Build (CI)
+
+# Apka nie ma jeszcze testów jednostkowych/UI (brak test targetu w project.yml)
+# - ten workflow służy więc tylko jako "kanarek kompilacji": łapie błędy
+#   składniowe/typów zanim wylądują w main, bez Xcode na lokalnej maszynie.
+# Buduje na symulator (bez podpisywania), bo runner CI nie ma zespołu
+# deweloperskiego (DEVELOPMENT_TEAM w project.yml jest celowo puste).
+#
+# Uruchamia się na push (każdy branch) i pull requestach do main, plus
+# ręcznie (workflow_dispatch), gdyby trzeba było sprawdzić build bez pushowania.
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: xcodebuild (Debug, Simulator)
+    runs-on: macos-15
+    steps:
+      - name: Checkout kodu
+        uses: actions/checkout@v5
+
+      # Xcode 16 wymagany dla iOS 17 deployment target / nowszych API HealthKit
+      # użytych w Health/HealthSyncService.swift (np. workout.statistics(for:)).
+      - name: Wybór wersji Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.2'
+
+      # Projekt nie trzyma commitowanego .xcodeproj (zob. .gitignore) -
+      # generujemy go z project.yml, tak samo jak deweloper robi to lokalnie.
+      - name: Instalacja XcodeGen
+        run: brew install xcodegen
+
+      - name: Generowanie projektu Xcode (xcodegen)
+        run: xcodegen generate
+
+      - name: Build (symulator, bez podpisywania)
+        run: |
+          xcodebuild build \
+            -project Dietetyk.xcodeproj \
+            -scheme Dietetyk \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO

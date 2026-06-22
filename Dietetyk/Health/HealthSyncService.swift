@@ -50,7 +50,12 @@ actor HealthSyncService {
         return specs
     }()
 
-    private static let exportDateFormatter: DateFormatter = {
+    // Poniższe trzy pomocnicze funkcje/wartości są celowo "internal" (nie
+    // "private") - to czysta logika (formatowanie dat, mapowanie nazw
+    // treningów) bez zależności od żywego HealthKit/sieci, więc warto ją
+    // pokryć testami jednostkowymi (DietetykTests, `@testable import
+    // Dietetyk`). Nadal nie są częścią publicznego API modułu.
+    static let exportDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -203,7 +208,7 @@ actor HealthSyncService {
     /// dzień kalendarzowy po stronie backendu (konwersja do Europe/Warsaw w
     /// `dateObjToLocalDateString`) zawsze wypadł na ten sam dzień,
     /// niezależnie od różnicy strefy czasowej między urządzeniem a serwerem.
-    private static func exportDateString(forDay day: Date) -> String {
+    static func exportDateString(forDay day: Date) -> String {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: day)
         let noon = calendar.date(byAdding: .hour, value: 12, to: startOfDay) ?? startOfDay
@@ -228,7 +233,7 @@ actor HealthSyncService {
         )
     }
 
-    private static func workoutActivityName(_ type: HKWorkoutActivityType) -> String {
+    static func workoutActivityName(_ type: HKWorkoutActivityType) -> String {
         switch type {
         case .running: return "Running"
         case .walking: return "Walking"

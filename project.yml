@@ -32,10 +32,12 @@ targets:
         INFOPLIST_KEY_NSCameraUsageDescription: "Aplikacja potrzebuje dostępu do aparatu, aby zrobić zdjęcie posiłku do analizy AI."
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Aplikacja potrzebuje dostępu do zdjęć, aby wybrać zdjęcie posiłku do analizy AI."
         INFOPLIST_KEY_NSHealthShareUsageDescription: "Aplikacja odczytuje dane z Zdrowia (kroki, kalorie, dystans, treningi, temperatura nadgarstka), aby zsynchronizować je z Twoim kontem Dietetyk AI - zastępuje to ręczną konfigurację webhooka Health Auto Export."
-    info:
-      properties:
-        UISupportedInterfaceOrientations:
-          - UIInterfaceOrientationPortrait
+        # GENERATE_INFOPLIST_FILE: YES synteyzuje Info.plist z ustawień
+        # INFOPLIST_KEY_* - klucz typu "lista" (np. orientacje) ustawia się
+        # jako string z wartościami rozdzielonymi spacją, NIE przez osobny
+        # blok "info:" (ten wymaga "path:" do realnego pliku .plist i bez
+        # niego xcodegen 2.45.4 wywala "Decoding failed at \"path\"").
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
     capabilities: []
     entitlements:
       path: Dietetyk/Dietetyk.entitlements
@@ -43,12 +45,36 @@ targets:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.background-delivery: true
 
+  # Testy jednostkowe logiki, która nie wymaga realnego sprzętu/danych
+  # HealthKit ani sieci (kontrakt JSON webhooka, formatowanie dat,
+  # walidacja adresu serwera) - patrz DietetykTests/. CI (xcodebuild test)
+  # uruchamia je na symulatorze przy każdym push/PR.
+  DietetykTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: DietetykTests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        ENABLE_TESTABILITY: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Dietetyk.app/Dietetyk"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+    dependencies:
+      - target: Dietetyk
+
 schemes:
   Dietetyk:
     build:
       targets:
         Dietetyk: all
+        DietetykTests: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - DietetykTests
     archive:
       config: Release

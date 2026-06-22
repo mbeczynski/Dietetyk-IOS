@@ -18,6 +18,17 @@ final class SettingsViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var successMessage: String?
 
+    // MARK: - Synchronizacja Apple Health (HealthKit) - zastępstwo webhooka
+    // "Health Auto Export", patrz `HealthSyncService`.
+    @Published private(set) var healthSyncEnabled = HealthSyncPreferences.isEnabled
+    @Published private(set) var isSyncingHealth = false
+    @Published var healthSyncMessage: String?
+    @Published private(set) var lastHealthSyncDate: Date? = HealthSyncPreferences.lastSyncDate
+
+    var isHealthDataAvailable: Bool {
+        HealthKitManager.shared.isHealthDataAvailable
+    }
+
     private let appState: AppState
 
     init(appState: AppState) {
@@ -95,5 +106,47 @@ final class SettingsViewModel: ObservableObject {
 
     func logout() {
         appState.logout()
+    }
+
+    // MARK: - Synchronizacja Apple Health
+
+    /// Wołane przełącznikiem w UI. Wyłączenie jest natychmiastowe i nie
+    /// wymaga sieci; włączenie wymaga zgody systemowej (HealthKit) i
+    /// pierwszej synchronizacji, więc dzieje się asynchronicznie - w razie
+    /// błędu przełącznik wraca do stanu wyłączonego.
+    func setHealthSyncEnabled(_ enabled: Bool) {
+        healthSyncEnabled = enabled
+        HealthSyncPreferences.isEnabled = enabled
+        healthSyncMessage = nil
+        guard enabled else { return }
+        Task { await enableHealthSync() }
+    }
+
+    private func enableHealthSync() async {
+        do {
+            try await HealthKitManager.shared.requestAuthorization()
+            await HealthSyncService.shared.startObservingIfEnabled()
+            await syncHealthNow()
+        } catch {
+            healthSyncEnabled = false
+            HealthSyncPreferences.isEnabled = false
+            healthSyncMessage = "Nie udało się włączyć synchronizacji: \(error.localizedDescription)"
+        }
+    }
+
+    func syncHealthNow() async {
+        guard healthSyncEnabled else { return }
+        isSyncingHealth = true
+        healthSyncMessage = nil
+        defer { isSyncingHealth = false }
+        do {
+            let count = try await HealthSyncService.shared.syncNow()
+            lastHealthSyncDate = HealthSyncPreferences.lastSyncDate
+            healthSyncMessage = count > 0
+                ? "Zsynchronizowano (\(count) wpisów)."
+                : "Zsynchronizowano - brak nowych danych do wysłania."
+        } catch {
+            healthSyncMessage = "Błąd synchronizacji: \(error.localizedDescription)"
+        }
     }
 }

@@ -11,6 +11,10 @@ DerivedData/
 # XcodeGen generuje .xcodeproj z project.yml - nie commitujemy wygenerowanego
 # projektu (binarny, konfliktogenny w diffach), tylko jego "źródło prawdy".
 
+# To samo dotyczy entitlements - XcodeGen generuje go z project.yml
+# (sekcja entitlements:), więc plik wynikowy też nie jest commitowany.
+*.entitlements
+
 # Swift Package Manager
 .swiftpm/
 Packages/

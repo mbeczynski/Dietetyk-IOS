@@ -92,6 +92,10 @@ final class LoginViewModel: ObservableObject {
             code = ""
         case .requiresPasswordChange(let tempToken):
             stage = .forcedPasswordChange(tempToken: tempToken)
+            // Czyścimy `code` tak samo jak przy przejściu do kroków 2FA -
+            // poprzednio zostawało tu wpisane wcześniej (np. błędne) hasło
+            // jednorazowe, mimo że ten etap go już nie używa.
+            code = ""
         }
     }
 

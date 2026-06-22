@@ -31,11 +31,17 @@ targets:
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_NSCameraUsageDescription: "Aplikacja potrzebuje dostępu do aparatu, aby zrobić zdjęcie posiłku do analizy AI."
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Aplikacja potrzebuje dostępu do zdjęć, aby wybrać zdjęcie posiłku do analizy AI."
+        INFOPLIST_KEY_NSHealthShareUsageDescription: "Aplikacja odczytuje dane z Zdrowia (kroki, kalorie, dystans, treningi, temperatura nadgarstka), aby zsynchronizować je z Twoim kontem Dietetyk AI - zastępuje to ręczną konfigurację webhooka Health Auto Export."
     info:
       properties:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
     capabilities: []
+    entitlements:
+      path: Dietetyk/Dietetyk.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.background-delivery: true
 
 schemes:
   Dietetyk:

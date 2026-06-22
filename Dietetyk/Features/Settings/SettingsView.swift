@@ -43,6 +43,45 @@ struct SettingsView: View {
                     .disabled(viewModel.isSaving)
                 }
 
+                if viewModel.isHealthDataAvailable {
+                    Section {
+                        Toggle("Synchronizuj z Apple Health", isOn: Binding(
+                            get: { viewModel.healthSyncEnabled },
+                            set: { viewModel.setHealthSyncEnabled($0) }
+                        ))
+
+                        if viewModel.healthSyncEnabled {
+                            HStack {
+                                Text("Ostatnia synchronizacja")
+                                Spacer()
+                                Text(viewModel.lastHealthSyncDate.map { APIDateFormat.displayDateTimeFormatter.string(from: $0) } ?? "—")
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Button {
+                                Task { await viewModel.syncHealthNow() }
+                            } label: {
+                                if viewModel.isSyncingHealth {
+                                    ProgressView()
+                                } else {
+                                    Text("Synchronizuj teraz")
+                                }
+                            }
+                            .disabled(viewModel.isSyncingHealth)
+                        }
+
+                        if let healthSyncMessage = viewModel.healthSyncMessage {
+                            Text(healthSyncMessage)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    } header: {
+                        Text("Synchronizacja zdrowia")
+                    } footer: {
+                        Text("Zastępuje webhook \"Health Auto Export\" - kroki, kalorie, dystans i treningi z Zdrowia są wysyłane do Twojego konta automatycznie, bez dodatkowej apki.")
+                    }
+                }
+
                 Section("Adres serwera") {
                     TextField("https://moj-serwer.pl", text: $viewModel.serverURLText)
                         .keyboardType(.URL)

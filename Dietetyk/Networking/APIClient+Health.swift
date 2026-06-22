@@ -19,4 +19,20 @@ extension APIClient {
     func fetchHealthHistory() async throws -> [HealthHistoryEntry] {
         try await get("/api/health/history")
     }
+
+    /// Wysyła dane HealthKit do TEGO SAMEGO webhooka, który dotąd przyjmował
+    /// payloady z apki "Health Auto Export" (`backend/routes/appleHealth.js`)
+    /// - stąd `requiresAuth: false`. Ten endpoint jest zamontowany PRZED
+    /// middleware'em sesji i autoryzuje się przez `syncToken` wpisany
+    /// wprost w URL-u, nie przez Bearer token (patrz komentarz na początku
+    /// `appleHealth.js`). Backend nie wymaga żadnych zmian - liczy się tylko
+    /// kształt JSON-a w `HealthExportPayload`.
+    @discardableResult
+    func syncAppleHealth(syncToken: String, payload: HealthExportPayload) async throws -> AppleHealthSyncResponse {
+        try await send(
+            "/api/integrations/apple-health/\(syncToken)",
+            body: payload,
+            requiresAuth: false
+        )
+    }
 }

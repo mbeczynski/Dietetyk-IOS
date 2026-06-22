@@ -22,6 +22,15 @@ enum APIDateFormat {
         return formatter
     }()
 
+    /// Data + godzina (np. "18 cze 2026, 14:32") - używane do pokazania
+    /// "ostatniej synchronizacji" Apple Health w Ustawieniach.
+    static let displayDateTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
     static func string(from date: Date) -> String {
         isoFormatter.string(from: date)
     }
